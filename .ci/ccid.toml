@@ -4,8 +4,12 @@ project = "cnry"
 # Gates from evidenced source (see review); no full-test claims beyond these.
 [checks.verify]
 kind = "commands"
-commands = [["bash", ".ci/verify.sh"]]
-cache_tools = [["rustc", "-vV"], ["cargo", "--version"], ["rustup", "run", "nightly", "rustc", "-vV"], ["rustup", "run", "nightly", "cargo", "llvm-cov", "--version"]]
+commands = [
+  ["cargo", "fmt", "--all", "--check"],
+  ["cargo", "clippy", "--locked", "--all-targets", "--", "-D", "warnings"],
+  ["cargo", "test", "--locked"],
+]
+cache_tools = [["rustc", "-vV"], ["cargo", "--version"]]
 cache_outputs = []
 
 [render]
@@ -15,4 +19,10 @@ scheduler = "forgejo"
 runs_on = "linux"
 checks = ["verify"]
 workflow = "ci"
-command = ["bash", ".ci/run-cached.sh"]
+command = ["ccid:run-declared-checks"]
+
+[runtime]
+tools = []
+install_root = true
+
+[toolchain]

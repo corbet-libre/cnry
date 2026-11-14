@@ -2,7 +2,7 @@
   "schema": 1,
   "generator": "ccid render v1",
   "tool_revision": "",
-  "manifest_sha256": "b28f4e0ec3a45883ce752476817f172171bbdd32b9029383aacba859f7e051a0",
+  "manifest_sha256": "a1ca231ced563725e8617e83940ad249429d80f07379584e9326a5ce9b6ffea0",
   "jobs": {
     "verify": {
       "job": "verify",
@@ -12,8 +12,7 @@
       ],
       "workflow": "ci",
       "command": [
-        "bash",
-        ".ci/run-cached.sh"
+        "ccid:run-declared-checks"
       ],
       "runs_on": "linux",
       "archive_inputs": true
