@@ -16,4 +16,3 @@ runs_on = "linux"
 checks = ["verify"]
 workflow = "ci"
 command = ["bash", ".ci/run-cached.sh"]
-events = ["manual"]
