@@ -2,46 +2,51 @@
 
 **Warrant canary: a signed, fresh statement that we have not been compelled.**
 
-`cnry` publishes and checks a warrant canary. While a valid, fresh statement
-exists, applications show it (in cmeet: a bird that flies). When the statement
-stops being renewed, fails verification or goes stale, the canary is gone.
+While a valid, unexpired statement exists the canary sits on its swing and
+sings. When it is missing, expired, unverifiable or stale, the swing is empty.
+The answer is present or absent, never anything in between, and nothing in
+this project renews a statement or notifies anyone.
 
-Status: name reserved, no implementation yet. Low priority.
-
-## How it works
-
-| Part | Design |
+| Part | Where |
 |---|---|
-| Statement | "As of this date we have received no order to modify our software, hand over keys or data, or log member activity", plus the date |
-| Freshness | Each statement carries a value nobody could know in advance (for example a recent public block hash), so statements cannot be signed ahead of time |
-| Signing | Several signers; every one of them is required. Signing keys stay with the signers, never on a server |
-| Renewal | Automatic and scheduled. Each renewal needs a short confirmation from every signer; if any confirmation is missing, renewal stops and the canary dies |
-| Publication | Automatic, to several independent places, so the statement cannot be swapped out in one place unnoticed |
-| Check | In the client: the signer keys are pinned in the application; valid signatures from all signers and an age within the allowed window mean the canary is alive |
+| Format `cnry/1` (draft) | [`docs/spec.md`](docs/spec.md) |
+| Rust library: parse, canonicalise (RFC 8785), sign, verify | `src/` |
+| CLI: `cnry keygen`, `pubkey`, `sign`, `verify` | `src/bin/cnry.rs` |
+| Terminal renderer (half blocks, 24-bit or 256 colours) | `src/term.rs`, `examples/canary.rs` |
+| Web component `<cnry-canary>` (canvas, birdsong, reduced motion) | `web/cnry-canary.js` |
+| Small devices (ESP32, LED) | [`docs/small-devices.md`](docs/small-devices.md) |
 
-The canary dies only by **not being renewed**. Nothing in our software ever
-kills it actively: an automatic trigger (for example from a legal order entered
-elsewhere) would be active disclosure, which a gag order can forbid.
+## Use
 
-## Boundaries
+```sh
+cnry keygen ./canary.key                      # writes the key only to that path
+cnry sign --key ./canary.key --system corbet.ch --statement text.txt --days 30 > canary.json
+cnry verify --key ed25519pub:... canary.json  # PRESENT or ABSENT (exit 0 or 1)
+cargo run --example canary -- --key ed25519pub:... canary.json
+```
 
-What it does:
+`sign` fetches a recent Bitcoin block (default `https://blockstream.info`,
+change with `--api`) as the freshness proof, takes the lifetime from
+`--days` (no default), and reads the key from the given file. Nothing is
+generated or stored silently.
 
-- Builds, signs and publishes canary statements on a schedule.
-- Verifies a statement in the client and answers: alive or gone.
+```html
+<script type="module" src="/cnry-canary.js"></script>
+<cnry-canary src="/.well-known/canary.json" key="ed25519pub:..."></cnry-canary>
+```
 
-What it never does:
+The component verifies in the browser against the pinned `key`, uses WebCrypto
+Ed25519 where available and otherwise the vendored
+[noble-ed25519](web/vendor/noble-ed25519.js) (MIT, v2.3.0), and shows the
+empty swing on any failure. Library users without the CLI build with
+`default-features = false`.
 
-- Never depends on or is triggered by cvld, cfrm, cmsg or clbs. It is independent of every other library.
-- Never holds signing keys on a server.
-- No own cryptographic primitives: established signature schemes only.
+## Tests
 
-Warrant canaries are largely untested in court. They inform and deter; they are
-not legal protection.
+`cargo test` runs the canonicalisation vectors (RFC 8785), sign and verify
+round trips, tamper, expiry and freshness cases, the sprite parity check
+against the web component, and `node --test web/test.mjs` when Node is
+installed (Rust-signed vectors verified by the web code, WebCrypto and the
+vendored fallback).
 
-## License
-
-Copyright 2026 Julian Y. Richard Corbet. Licensed under
-[LGPL-3.0-only](LICENSES/LGPL-3.0-only.txt)
-[WITH LGPL-3.0-linking-exception](LICENSES/LGPL-3.0-linking-exception.txt).
-See [LICENSE.md](LICENSE.md).
+Licence: LGPL-3.0-only WITH LGPL-3.0-linking-exception.

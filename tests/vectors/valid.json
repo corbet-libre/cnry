@@ -1,0 +1,15 @@
+{
+  "schema": "cnry/1",
+  "system": "corbet.ch",
+  "issued": "2026-11-15T12:00:00Z",
+  "expires": "2026-12-15T12:00:00Z",
+  "statement": "No order has been received.",
+  "freshness": {
+    "kind": "bitcoin-block",
+    "height": 900000,
+    "hash": "00000000000000000001a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f7",
+    "time": "2026-11-15T11:50:00Z"
+  },
+  "key": "ed25519:fe812c12f3ab4ce6ac5db69ac352f906cb1b11ef",
+  "signature": "WYeD4TTgmJFKqmihJ5uCOqSB0P_9M3O36giw35u8DHDCWu-Vjmhd5xoURG7HL7zKqnPQeiOAB2XIoU_1kDpKBw"
+}

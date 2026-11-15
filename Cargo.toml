@@ -1,6 +1,6 @@
 [package]
 name = "cnry"
-version = "0.0.0"
+version = "0.1.0"
 edition = "2024"
 rust-version = "1.88"
 description = "Warrant canary: signed, fresh statements that we have not been compelled"
@@ -8,7 +8,7 @@ license = "LGPL-3.0-only WITH LGPL-3.0-linking-exception"
 repository = "https://github.com/corbet-foss/cnry"
 readme = "README.md"
 publish = false
-include = ["Cargo.toml", "src/**", "README.md", "LICENSE", "LICENSE.md", "LICENSES/LGPL-3.0-only.txt", "LICENSES/LGPL-3.0-linking-exception.txt", "LICENSES/GPL-3.0-only.txt"]
+include = ["Cargo.toml", "src/**", "README.md", "docs/**", "web/**", "LICENSE", "LICENSE.md", "LICENSES/LGPL-3.0-only.txt", "LICENSES/LGPL-3.0-linking-exception.txt", "LICENSES/GPL-3.0-only.txt"]
 
 [lib]
 crate-type = ["rlib"]
@@ -16,3 +16,26 @@ crate-type = ["rlib"]
 [lints.rust]
 unsafe_code = "forbid"
 missing_docs = "warn"
+
+[dependencies]
+base64 = "0.22"
+ed25519-dalek = "2"
+getrandom = { version = "0.3", optional = true }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+time = { version = "0.3", features = ["parsing", "formatting", "macros"] }
+ureq = { version = "3", optional = true }
+
+[features]
+default = ["cli"]
+# The signer/verifier command line and its network and randomness needs. A
+# library consumer (a kiosk, a relay) builds with `default-features = false`.
+cli = ["dep:ureq", "dep:getrandom"]
+
+[[bin]]
+name = "cnry"
+required-features = ["cli"]
+
+[[example]]
+name = "canary"
